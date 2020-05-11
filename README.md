@@ -13,7 +13,7 @@ _A list of my commonly used Git commands_
 | `Clone [repository-name]` | Create a local copy of a remote repository |
 | `Commit` | Commit changes |
 | `Push` | Push changes to remote repository |
-| `Pull` | Update local repository to the newest commit |
+| `Pull/Fetch` | Update local repository to the newest commit |
 
 
 ## GitBash
