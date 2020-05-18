@@ -23,7 +23,7 @@ def NetD(LowWave, HighWave):
 
 
 Te1= 3500
-Ae1 = 8.25
+Ae1 = 9
 Te2= 2200
 Ae2 = 20
 Te3= 1600
@@ -37,7 +37,7 @@ c = 3* 10**(8)
 k = 1.38 * 10**(-23)
 
 MinSNRRatio = 5.5
-MinSNR = 10
+MinSNR = 30
 MinTDiff = 5
 
 VisualLambs = np.array([0.413,0.443,0.490,0.520,0.565,0.620,0.665,0.682,0.750,0.820,0.865,0.905,0.940,0.980]) * 10**(-6)
@@ -46,9 +46,8 @@ NetDs = np.array([390,515,557,556,555,467,399,273,302,203,255,138,100,59])
 A,B,C,D = np.polyfit(VisualLambs,NetDs,3)
 
 #Input
-LowerLamb = 0.975 * 10**(-6) 
-UpperLamb = 1 * 10**(-6)
-TargetDT = 7.5
+LowerLamb = 0.1 * 10**(-6) 
+UpperLamb = 6 * 10**(-6)
 TargetRatio = 1.1
 PixelArea = np.power(15.0*np.power(10.0,-6),2)
 OrbitAltitude = 500000
@@ -58,18 +57,42 @@ OrbitAltitude = 500000
 if UpperLamb < 1.1*10**(-6):
     NetD = NetD(LowerLamb, UpperLamb)
 else:
-    NetD = 20*10**(-3)
+    NetD = 2*10**(-3)
 
 #Initials
-H = 180
-W = 180
+H = 170
+W = 170
 Ab = (H*W) - Ae
 
 Waves = np.linspace(LowerLamb, UpperLamb, 1000)
 PlanckTe = Ae1/Ae * planck(Waves, Te1, emissivityE) + Ae2/Ae * planck(Waves, Te2, emissivityE) + Ae3/Ae * planck(Waves, Te3, emissivityE)
 PlanckTb = planck(Waves, Tb, emissivityB) + planck(Waves, 5250, 0.000028)
 
-Ttable = np.linspace(Tb, Te3, 20000)
+
+NormFactor = np.power(10.0,-9) * np.amax(PlanckTe)
+
+PlotFontSize = 25
+Waves2 = 1000000*Waves
+plt.figure()
+plt.plot(Waves2, 100/NormFactor * np.power(10.0,-9) * PlanckTe, color = "red", label = "Net exhaust gas")
+plt.plot(Waves2, 100/NormFactor * np.power(10.0,-9) * PlanckTb, color = "green", label = "Background radiance")
+plt.plot(Waves2, 100/NormFactor * np.power(10.0,-9) * Ae1/Ae * planck(Waves, Te1, emissivityE), color = "orange", linestyle = "dashdot", label = "Exhaust gas at 3500k")
+plt.plot(Waves2, 100/NormFactor * np.power(10.0,-9) * Ae2/Ae * planck(Waves, Te2, emissivityE), color = "orange", linestyle = "dashed", label = "Exhaust gas at 2200k")
+plt.plot(Waves2, 100/NormFactor * np.power(10.0,-9) * Ae3/Ae * planck(Waves, Te3, emissivityE), color = "orange", linestyle = "dotted", label = "Exhaust gas at 1600k")
+plt.xlabel('Wavelenght [μm]', fontsize = PlotFontSize)
+plt.ylabel('Relative spectral radiance', fontsize = PlotFontSize)
+plt.xticks(fontsize=PlotFontSize)
+plt.yticks(fontsize=PlotFontSize)
+plt.legend(fontsize = PlotFontSize)
+yourmom = plt.gca()
+yourmom.yaxis.grid()
+plt.show()
+
+
+
+
+
+Ttable = np.linspace(Tb, Te3, 50000)
 Wmmtable = np.zeros(len(Ttable))
 
 SR = PixelArea/OrbitAltitude
@@ -137,6 +160,11 @@ if Tdiff < MinTDiff:
     print("***********************************************")
     print("RES too large, Tdiff smaller than threshold")
     print("***********************************************")
+
+
+
+
+
 
 
 
