@@ -22,6 +22,7 @@ def NetD(LowWave, HighWave):
     return NetD
 
 
+
 Te1= 3500
 Ae1 = 9
 Te2= 2200
@@ -46,8 +47,8 @@ NetDs = np.array([390,515,557,556,555,467,399,273,302,203,255,138,100,59])
 A,B,C,D = np.polyfit(VisualLambs,NetDs,3)
 
 #Input
-LowerLamb = 0.1 * 10**(-6) 
-UpperLamb = 6 * 10**(-6)
+LowerLamb = 3 * 10**(-6) 
+UpperLamb = 5 * 10**(-6)
 TargetRatio = 1.1
 PixelArea = np.power(15.0*np.power(10.0,-6),2)
 OrbitAltitude = 500000
@@ -60,9 +61,12 @@ else:
     NetD = 2*10**(-3)
 
 #Initials
-H = 170
-W = 170
+NormalAngle = 78
+H = 500
+W = 500
 Ab = (H*W) - Ae
+
+emissivityB = emissivityB*np.cos(NormalAngle*np.pi/180)
 
 Waves = np.linspace(LowerLamb, UpperLamb, 1000)
 PlanckTe = Ae1/Ae * planck(Waves, Te1, emissivityE) + Ae2/Ae * planck(Waves, Te2, emissivityE) + Ae3/Ae * planck(Waves, Te3, emissivityE)
@@ -87,9 +91,6 @@ plt.legend(fontsize = PlotFontSize)
 yourmom = plt.gca()
 yourmom.yaxis.grid()
 plt.show()
-
-
-
 
 
 Ttable = np.linspace(Tb, Te3, 50000)
