@@ -11,8 +11,63 @@ import matplotlib.pyplot as plt
 #All SI units
 
 #Functions
-def planck(Wavelength, Temp, emissivity):
-    return emissivity*((2*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
+
+#Filter definition:
+
+SelectFilter = 2 #[1/ 2/ None]
+
+
+LowCutoffFilter = 0
+HightCutoffFilter = 0
+FilterTransparency = 0
+LowCutoffBand = 0
+HighCutoffBand = 0
+Scaling = 1
+
+if SelectFilter == 2:
+    LowCutoffFilter = 4.1 * 10**(-6)
+    HightCutoffFilter = 4.52 * 10**(-6)
+
+    FilterTransparency = 0.8
+    Scaling = 0.7
+
+    LowCutoffBand = 4.22 * 10**(-6)
+    HighCutoffBand = 4.45 * 10**(-6)                 
+    UseFilter = True
+elif SelectFilter == 1:
+    LowCutoffFilter = 2.625 * 10**(-6)
+    HightCutoffFilter = 2.775  * 10**(-6)
+
+    FilterTransparency = 0.25
+    Scaling = 1
+
+    LowCutoffBand = 2.7 * 10**(-6)
+    HighCutoffBand = 2.9 * 10**(-6)
+    UseFilter = True
+else:
+    UseFilter = False
+
+
+def planck(Wavelength, Temp, emissivity, Filtered = True):
+    PlankArray = np.zeros(np.shape(Wavelength)[0])
+    if Filtered == True:
+        if UseFilter == True:
+            for i in range(0,np.shape(Wavelength)[0]):
+                if Wavelength[i] > LowCutoffFilter and Wavelength[i] < HightCutoffFilter:
+                    if Temp > 500 and Temp < 4000:
+                        PlankArray[i] = Scaling*FilterTransparency*emissivity*((2*h*c*c)/(Wavelength[i]**5))/(np.exp((h*c)/(Wavelength[i]*k*Temp)) - 1)
+                    else:
+                        PlankArray[i] = FilterTransparency*emissivity*((2*h*c*c)/(Wavelength[i]**5))/(np.exp((h*c)/(Wavelength[i]*k*Temp)) - 1)
+                if Temp < 500 and Wavelength[i] > LowCutoffBand and Wavelength[i] < HighCutoffBand:
+                    PlankArray[i] = 0
+                if Wavelength[i] < LowCutoffFilter or Wavelength[i] > HightCutoffFilter:
+                    PlankArray[i] = 0
+            return PlankArray
+        else:
+            return emissivity*((2*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
+    else:
+        return emissivity*((2*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
+    #print("ERROR, no condition satisfied!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
 def NetD(LowWave, HighWave):
     FreqArray = np.linspace(LowWave,HighWave, 600)
@@ -22,23 +77,23 @@ def NetD(LowWave, HighWave):
     return NetD
 
 
-
-Te1= 3500
-Ae1 = 9
-Te2= 2200
-Ae2 = 20
-Te3= 1600
-Ae3 = 25
+Ascale = 11.75
+Te1= 2500
+Ae1 = 1*Ascale
+Te2= 1700
+Ae2 = 1*Ascale
+Te3= 1200
+Ae3 = 12*Ascale
 Ae = Ae1+Ae2+Ae3 
 Tb = 303.15
 emissivityE = 0.1
 emissivityB = 0.8
-h = 6.63 * 10**(-34)
+h = 6.624 * 10**(-34)
 c = 3* 10**(8)
 k = 1.38 * 10**(-23)
 
-MinSNRRatio = 5.5
-MinSNR = 30
+MinSNRRatio = 5
+MinSNR = 5
 MinTDiff = 5
 
 VisualLambs = np.array([0.413,0.443,0.490,0.520,0.565,0.620,0.665,0.682,0.750,0.820,0.865,0.905,0.940,0.980]) * 10**(-6)
@@ -47,7 +102,7 @@ NetDs = np.array([390,515,557,556,555,467,399,273,302,203,255,138,100,59])
 A,B,C,D = np.polyfit(VisualLambs,NetDs,3)
 
 #Input
-LowerLamb = 3 * 10**(-6) 
+LowerLamb = 2.64 * 10**(-6) 
 UpperLamb = 5 * 10**(-6)
 TargetRatio = 1.1
 PixelArea = np.power(15.0*np.power(10.0,-6),2)
@@ -58,12 +113,12 @@ OrbitAltitude = 500000
 if UpperLamb < 1.1*10**(-6):
     NetD = NetD(LowerLamb, UpperLamb)
 else:
-    NetD = 2*10**(-3)
+    NetD = 92.6*10**(-3)
 
 #Initials
-NormalAngle = 78
-H = 500
-W = 500
+NormalAngle = 81
+H = 5434
+W = 5434
 Ab = (H*W) - Ae
 
 emissivityB = emissivityB*np.cos(NormalAngle*np.pi/180)
@@ -71,6 +126,7 @@ emissivityB = emissivityB*np.cos(NormalAngle*np.pi/180)
 Waves = np.linspace(LowerLamb, UpperLamb, 1000)
 PlanckTe = Ae1/Ae * planck(Waves, Te1, emissivityE) + Ae2/Ae * planck(Waves, Te2, emissivityE) + Ae3/Ae * planck(Waves, Te3, emissivityE)
 PlanckTb = planck(Waves, Tb, emissivityB) + planck(Waves, 5250, 0.000028)
+
 
 
 NormFactor = np.power(10.0,-9) * np.amax(PlanckTe)
@@ -93,15 +149,24 @@ yourmom.yaxis.grid()
 plt.show()
 
 
-Ttable = np.linspace(Tb, Te3, 50000)
+Ttable = np.linspace(Tb, Te3, 1000)
 Wmmtable = np.zeros(len(Ttable))
 
 SR = PixelArea/OrbitAltitude
 
+PlanckTbControlUNFILTERED = planck(Waves, Tb, emissivityB, False) + planck(Waves, 5250, 0.000028, False)
+WmmTbControlUNFILTERED = np.trapz(PlanckTbControlUNFILTERED, Waves)*SR
+PlanckTbControl = planck(Waves, Tb, emissivityB) + planck(Waves, 5250, 0.000028)
+WmmTbControl = np.trapz(PlanckTbControl, Waves)*SR
+print("The unfiltered integrated WmmTB as control is:", WmmTbControlUNFILTERED)
+print("The filtered integrated WmmTB as control is:", WmmTbControl)
+
 for i in range(len(Ttable)):
     PlanckT = planck(Waves, Ttable[i], emissivityB) + planck(Waves, 5250, 0.000028)
     Wmmtable[i] = np.trapz(PlanckT, Waves)*SR
-    
+    if i%100 == 0:
+        print(i)
+print("FINISH")
 WmmTe = np.trapz(PlanckTe, Waves)*SR
 WmmTb = np.trapz(PlanckTb, Waves)*SR
 
@@ -121,7 +186,7 @@ for i in range(len(Wmmtable)):
         index = i
         
 Tav = Ttable[index]
-
+print("b")
 
 PlanckTbNetD = planck(Waves, Tb + NetD, emissivityB) + planck(Waves, 5250 + NetD, 0.000028)
 WmmTbNetD = np.trapz(PlanckTbNetD, Waves)*SR
