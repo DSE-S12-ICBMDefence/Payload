@@ -55,18 +55,18 @@ def planck(Wavelength, Temp, emissivity, Filtered = True):
             for i in range(0,np.shape(Wavelength)[0]):
                 if Wavelength[i] > LowCutoffFilter and Wavelength[i] < HightCutoffFilter:
                     if Temp > 500 and Temp < 4000:
-                        PlankArray[i] = Scaling*FilterTransparency*emissivity*((2*h*c*c)/(Wavelength[i]**5))/(np.exp((h*c)/(Wavelength[i]*k*Temp)) - 1)
+                        PlankArray[i] = Scaling*FilterTransparency*emissivity*((2*np.pi*h*c*c)/(Wavelength[i]**5))/(np.exp((h*c)/(Wavelength[i]*k*Temp)) - 1)
                     else:
-                        PlankArray[i] = FilterTransparency*emissivity*((2*h*c*c)/(Wavelength[i]**5))/(np.exp((h*c)/(Wavelength[i]*k*Temp)) - 1)
+                        PlankArray[i] = FilterTransparency*emissivity*((2*np.pi*h*c*c)/(Wavelength[i]**5))/(np.exp((h*c)/(Wavelength[i]*k*Temp)) - 1)
                 if Temp < 500 and Wavelength[i] > LowCutoffBand and Wavelength[i] < HighCutoffBand:
                     PlankArray[i] = 0
                 if Wavelength[i] < LowCutoffFilter or Wavelength[i] > HightCutoffFilter:
                     PlankArray[i] = 0
             return PlankArray
         else:
-            return emissivity*((2*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
+            return emissivity*((2*np.pi*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
     else:
-        return emissivity*((2*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
+        return emissivity*((2*np.pi*h*c*c)/(Wavelength**5))/(np.exp((h*c)/(Wavelength*k*Temp)) - 1)
     #print("ERROR, no condition satisfied!!!!!!!!!!!!!!!!!!!!!!!!!!")
 
 def NetD(LowWave, HighWave):
