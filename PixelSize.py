@@ -2,7 +2,7 @@
 """
 Created on Sat May 16 16:44:15 2020
 
-@author: Luuk Hendriksen
+@author: Luuk Hendriksen, Guillermo Presa
 """
 
 import numpy as np
@@ -116,9 +116,9 @@ else:
     NetD = 92.6*10**(-3)
 
 #Initials
-NormalAngle = 81
-H = 5434
-W = 5434
+NormalAngle = 0
+H = 3300
+W = 3300
 Ab = (H*W) - Ae
 
 emissivityB = emissivityB*np.cos(NormalAngle*np.pi/180)

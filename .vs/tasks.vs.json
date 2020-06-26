@@ -1,0 +1,10 @@
+{
+  "version": "0.2.1",
+  "tasks": [
+    {
+      "taskLabel": "task-PixelSize",
+      "appliesTo": "PixelSize.py",
+      "type": "launch"
+    }
+  ]
+}

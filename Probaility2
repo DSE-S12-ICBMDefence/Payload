@@ -1,0 +1,23 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+MissionFailureProb = 0.01
+SpacecraftFailureProb = 0.1
+Loops = 1
+FailuresCount = 0
+
+
+
+SpacecraftArray = np.zeros((9, 34))
+
+print(SpacecraftArray)
+
+def UpdateSpacecraftFailureProb():
+	print("a")
+
+for i in range(0,Loops):
+	for x in range(0, SpacecraftArray.shape[0]):
+		for y in range(0, SpacecraftArray.shape[1]):
+        RandNumb = np.random.random()
+        print(RandNumb)
+        if RandNum
